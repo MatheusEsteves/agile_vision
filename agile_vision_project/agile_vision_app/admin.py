@@ -1,8 +1,24 @@
-from django.contrib.admin import AdminSite
-from .models import Member
+from django.contrib import admin
+from .models import *
+from .forms import *
 
-class AgileVisionAdmin(AdminSite):
-    site_header = 'Agile Vision Administration'
+class IndicatorsInline(admin.TabularInline):
+    model = IndicatorItem
+    extra = 0
 
-agilevision_admin_site = AgileVisionAdmin(name='admin')
-agilevision_admin_site.register(Member)
+class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectForm
+    inlines = [
+        IndicatorsInline
+    ]
+
+class TeamAdmin(admin.ModelAdmin):
+    form = TeamForm
+
+admin.site.register(Member)
+admin.site.register(Project, ProjectAdmin)
+admin.site.register(Team, TeamAdmin)
+admin.site.register(IndicatorVision)
+admin.site.register(IndicatorType)
+admin.site.register(TaskComplexity)
+admin.site.register(Task)

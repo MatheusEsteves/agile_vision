@@ -1,6 +1,6 @@
 from django.urls import path
-from .admin import agilevision_admin_site
+from django.contrib import admin
 
 urlpatterns = [
-    path('admin/', agilevision_admin_site.urls), 
+    path('admin/', admin.site.urls), 
 ]
