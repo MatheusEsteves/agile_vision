@@ -2,6 +2,7 @@ from django.db import models
 
 class Member(models.Model):
     name = models.CharField(max_length=50)
+    username = models.CharField(max_length=30, null=True)
     email = models.EmailField(null=True)
     role = models.CharField(max_length=50)
     description = models.TextField(max_length=1000, null=True)
@@ -41,6 +42,7 @@ class IndicatorType(models.Model):
         return self.name
 
 class Project(models.Model):
+    slug = models.CharField(max_length=30, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=1000)
     client = models.CharField(max_length=50)
@@ -67,6 +69,7 @@ class IndicatorItem(models.Model):
         return str(self.indicator_type)
 
 class Team(models.Model):
+    slug = models.CharField(max_length=30, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=1000)
     email = models.EmailField(null=True)
@@ -92,7 +95,7 @@ class TaskComplexity(models.Model):
         return self.name
 
 class Task(models.Model):
-    project = models.ForeignKey('Project', related_name='project_tasks', on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey('Project', related_name='tasks', on_delete=models.CASCADE, null=True)
     development_time = models.IntegerField()
     validation_time = models.IntegerField()
     blocking_time = models.IntegerField()
