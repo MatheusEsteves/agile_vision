@@ -18,4 +18,5 @@ urlpatterns = [
     path('api/teams/<slug>/members', TeamMemberListView.as_view(), name='team_members'),
     path('api/taskcomplexities', TaskComplexityListView.as_view(), name='task_complexities'),
     path('api/projects/<slug>/tasks', ProjectTaskListView.as_view(), name='project_tasks'),
+    path('api/projects/<slug>/tasks/classificator/<int:test_development_time>/<int:test_validation_time>/<int:test_blocking_time>', ClassificatorTaskView.as_view(), name='classificator')
 ]

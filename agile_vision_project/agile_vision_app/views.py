@@ -1,5 +1,6 @@
 from rest_framework import views, response
 from .models import *
+from .classificator import *
 
 def get_member_data(member):
     return {
@@ -154,3 +155,9 @@ class ProjectTaskListView(views.APIView):
             project = projects[0]
             tasks = project.tasks.all()
         return response.Response([get_task_data(task) for task in tasks])
+
+class ClassificatorTaskView(views.APIView):
+    def get(self, request, slug=None, test_development_time=0, test_validation_time=0, test_blocking_time=0):
+        complexity_suggestion = ClassificatorTask(slug).get_complexity_suggestion(test_development_time, test_validation_time, test_blocking_time)
+        return response.Response(get_task_complexity_data(complexity_suggestion))
+                
