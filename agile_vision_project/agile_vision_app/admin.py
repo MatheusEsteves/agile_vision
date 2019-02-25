@@ -15,6 +15,10 @@ class ProjectAdmin(admin.ModelAdmin):
 class TeamAdmin(admin.ModelAdmin):
     form = TeamForm
 
+class TaskLabelAdmin(admin.ModelAdmin):
+    form = TaskLabelForm
+    list_display = ['title', 'color']
+
 admin.site.register(Member)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Team, TeamAdmin)
@@ -22,3 +26,4 @@ admin.site.register(IndicatorVision)
 admin.site.register(IndicatorType)
 admin.site.register(TaskComplexity)
 admin.site.register(Task)
+admin.site.register(TaskLabel, TaskLabelAdmin)

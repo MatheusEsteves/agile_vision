@@ -29,3 +29,11 @@ class TeamForm(forms.ModelForm):
             label='Projects',
             widget=FilteredSelectMultiple(verbose_name='Projects', is_stacked=False)
         )
+    
+class TaskLabelForm(forms.ModelForm):
+    class Meta:
+        model = TaskLabel
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(TaskLabelForm, self).__init__(*args, **kwargs)

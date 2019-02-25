@@ -1,6 +1,7 @@
 from rest_framework import views, response
 from .models import *
 from .classificator import *
+import datetime
 
 def get_member_data(member):
     return {
@@ -57,13 +58,22 @@ def get_task_complexity_data(task_complexity):
         'name' : task_complexity.name,
         'weight' : task_complexity.weight
     }
+    
+def get_task_label_data(label):
+    return {
+        'title' : label.title,
+        'color' : label.color 
+    }
 
 def get_task_data(task):
     return {
+        'title' : task.title,
+        'labels' : [get_task_label_data(label) for label in task.labels.all()],
+        'delivery_date' : str(task.delivery_date),
         'development_time' : task.development_time,
         'validation_time' : task.validation_time,
         'blocking_time' : task.blocking_time,
-        'complexity' : get_task_complexity_data(task.complexity)
+        'complexity' : get_task_complexity_data(task.complexity) if task.complexity is not None else None
     }
 
 class MemberListView(views.APIView):
@@ -148,13 +158,31 @@ class TaskComplexityListView(views.APIView):
         return response.Response([get_task_complexity_data(task_complexity) for task_complexity in task_complexities])
 
 class ProjectTaskListView(views.APIView):
-    def get(self, request, slug=None):
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
         projects = Project.objects.filter(slug=slug)
-        tasks = []
+        tasks_object = None
+        project = None
         if projects:
             project = projects[0]
-            tasks = project.tasks.all()
-        return response.Response([get_task_data(task) for task in tasks])
+            tasks_object = project.tasks
+
+        tasks_list = []
+        if project is not None and tasks_object is not None:
+            start_date = None
+            end_date = None
+            if start_year is not None and start_month is not None and start_day is not None:
+                start_date = datetime.date(start_year, start_month, start_day)
+            if end_year is not None and end_month is not None and end_day is not None:
+                end_date = datetime.date(end_year, end_month, end_day)
+            
+            if start_date is not None and end_date is not None:
+                tasks_object = tasks_object.filter(delivery_date__range=(start_date, end_date))
+            elif start_date is not None:
+                tasks_object = tasks_object.filter(delivery_date__gte=start_date)
+            elif end_date is not None:
+                tasks_object = tasks_object.filter(delivery_date__lte=end_date)
+            tasks_list = tasks_object.all()
+        return response.Response([get_task_data(task) for task in tasks_list])
 
 class ClassificatorTaskView(views.APIView):
     def get(self, request, slug=None, test_development_time=0, test_validation_time=0, test_blocking_time=0):

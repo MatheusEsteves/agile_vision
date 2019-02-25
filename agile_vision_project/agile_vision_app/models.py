@@ -1,4 +1,5 @@
 from django.db import models
+from colorfield.fields import ColorField
 
 class Member(models.Model):
     name = models.CharField(max_length=50)
@@ -94,12 +95,26 @@ class TaskComplexity(models.Model):
     def __str__(self):
         return self.name
 
+class TaskLabel(models.Model):
+    title = models.CharField(max_length=30, null=True)
+    color = ColorField(null=True)
+
+    class Meta:
+        verbose_name = u'Task Label'
+        verbose_name_plural = u'Task Labels'
+
+    def __str__(self):
+        return self.title
+
 class Task(models.Model):
     project = models.ForeignKey('Project', related_name='tasks', on_delete=models.CASCADE, null=True)
-    development_time = models.IntegerField()
-    validation_time = models.IntegerField()
-    blocking_time = models.IntegerField()
-    complexity = models.ForeignKey('TaskComplexity', related_name='complexity_tasks', on_delete=models.CASCADE, null=True)
+    title = models.CharField(max_length=100, null=True)
+    labels = models.ManyToManyField(TaskLabel, related_name='tasks', blank=True)
+    delivery_date = models.DateField(max_length=30, null=True)
+    development_time = models.IntegerField(null=True, blank=True)
+    validation_time = models.IntegerField(null=True, blank=True)
+    blocking_time = models.IntegerField(null=True, blank=True)
+    complexity = models.ForeignKey('TaskComplexity', related_name='complexity_tasks', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = u'Task'
