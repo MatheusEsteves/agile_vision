@@ -9,8 +9,8 @@ class Member(models.Model):
     description = models.TextField(max_length=1000, null=True)
     mentor = models.CharField(max_length=50, null=True)
     photo = models.ImageField(upload_to='static/images/members', null=True)
-    next_holidays_start_date = models.DateField(null=True)
-    next_holidays_end_date = models.DateField(null=True)
+    next_vacation_start_date = models.DateField(null=True)
+    next_vacation_end_date = models.DateField(null=True)
     last_one_one_meeting_date = models.DateField(null=True)
     last_one_one_meeting_manager = models.CharField(max_length=50, null=True)
     

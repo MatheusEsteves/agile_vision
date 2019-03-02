@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/teams/<slug>/projects', TeamProjectListView.as_view(), name='team_projects'),
     path('api/teams/<slug>/members', TeamMemberListView.as_view(), name='team_members'),
     path('api/taskcomplexities', TaskComplexityListView.as_view(), name='task_complexities'),
+    path('api/projects/<slug>/unfinished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
     path('api/projects/<slug>/tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>', ProjectTaskListView.as_view(), name='project_tasks'),
     path('api/projects/<slug>/tasks/classificator/<int:test_development_time>/<int:test_validation_time>/<int:test_blocking_time>', ClassificatorTaskView.as_view(), name='classificator'),
 ]

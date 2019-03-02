@@ -157,31 +157,46 @@ class TaskComplexityListView(views.APIView):
         task_complexities = TaskComplexity.objects.all()
         return response.Response([get_task_complexity_data(task_complexity) for task_complexity in task_complexities])
 
+def get_project_tasks(slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None, filter_unfinished_tasks=False):
+    projects = Project.objects.filter(slug=slug)
+    tasks_object = None
+    project = None
+    if projects:
+        project = projects[0]
+        if filter_unfinished_tasks:
+            tasks_object = project.tasks.filter(complexity=None)
+        else:
+            tasks_object = project.tasks.all()
+
+    tasks_list = []
+    if project is not None and tasks_object is not None:
+        start_date = None
+        end_date = None
+        if start_year is not None and start_month is not None and start_day is not None:
+            start_date = datetime.date(start_year, start_month, start_day)
+        if end_year is not None and end_month is not None and end_day is not None:
+            end_date = datetime.date(end_year, end_month, end_day)
+        
+        if start_date is not None and end_date is not None:
+            tasks_object = tasks_object.filter(delivery_date__range=(start_date, end_date))
+        elif start_date is not None:
+            tasks_object = tasks_object.filter(delivery_date__gte=start_date)
+        elif end_date is not None:
+            tasks_object = tasks_object.filter(delivery_date__lte=end_date)
+        tasks_list = list(tasks_object.all())
+
+        if tasks_list is not None and len(tasks_list) > 0:
+            tasks_list.sort(key=lambda task:task.delivery_date, reverse=True)
+    return tasks_list
+
+class UnfinishedProjectTaskListView(views.APIView):
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
+        tasks_list = get_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day, True)
+        return response.Response([get_task_data(task) for task in tasks_list])
+
 class ProjectTaskListView(views.APIView):
     def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
-        projects = Project.objects.filter(slug=slug)
-        tasks_object = None
-        project = None
-        if projects:
-            project = projects[0]
-            tasks_object = project.tasks
-
-        tasks_list = []
-        if project is not None and tasks_object is not None:
-            start_date = None
-            end_date = None
-            if start_year is not None and start_month is not None and start_day is not None:
-                start_date = datetime.date(start_year, start_month, start_day)
-            if end_year is not None and end_month is not None and end_day is not None:
-                end_date = datetime.date(end_year, end_month, end_day)
-            
-            if start_date is not None and end_date is not None:
-                tasks_object = tasks_object.filter(delivery_date__range=(start_date, end_date))
-            elif start_date is not None:
-                tasks_object = tasks_object.filter(delivery_date__gte=start_date)
-            elif end_date is not None:
-                tasks_object = tasks_object.filter(delivery_date__lte=end_date)
-            tasks_list = tasks_object.all()
+        tasks_list = get_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day, False)
         return response.Response([get_task_data(task) for task in tasks_list])
 
 class ClassificatorTaskView(views.APIView):
