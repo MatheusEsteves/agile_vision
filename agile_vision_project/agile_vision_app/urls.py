@@ -18,13 +18,35 @@ urlpatterns = [
     path('api/teams/<slug>/members', TeamMemberListView.as_view(), name='team_members'),
     path('api/taskcomplexities', TaskComplexityListView.as_view(), name='task_complexities'),
     
-    path('api/projects/<slug>/unfinished_tasks/<start_date>/<end_date>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
-    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
-    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
-    path('api/projects/<slug>/tasks/<start_date>/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
+    path('api/projects/<slug>/unfinished_tasks/range_date/<start_date>/<end_date>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
+    path('api/projects/<slug>/unfinished_tasks/start_date/<start_date>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
+    path('api/projects/<slug>/unfinished_tasks/end_date/<end_date>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
+
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+
+    path('api/projects/<slug>/tasks/range_date/<start_date>/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
+    path('api/projects/<slug>/tasks/start_date/<start_date>', ProjectTaskListView.as_view(), name='project_tasks'),
+    path('api/projects/<slug>/tasks/end_date/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
     
-    path('api/projects/<slug>/unfinished_tasks/<start_date>/<end_date>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
-    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
-    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
-    path('api/projects/<slug>/tasks/<start_date>/<end_date>/count', ProjectTaskCount.as_view(), name='project_task_count'),
+    path('api/projects/<slug>/unfinished_tasks/range_date/<start_date>/<end_date>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
+    path('api/projects/<slug>/unfinished_tasks/start_date/<start_date>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
+    path('api/projects/<slug>/unfinished_tasks/end_date/<end_date>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
+
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+
+    path('api/projects/<slug>/tasks/range_date/<start_date>/<end_date>/count', ProjectTaskCount.as_view(), name='project_task_count'),
+    path('api/projects/<slug>/tasks/start_date/<start_date>/count', ProjectTaskCount.as_view(), name='project_task_count'),
+    path('api/projects/<slug>/tasks/end_date/<end_date>/count', ProjectTaskCount.as_view(), name='project_task_count'),
 ]
