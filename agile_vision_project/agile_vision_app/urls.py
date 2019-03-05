@@ -18,15 +18,13 @@ urlpatterns = [
     path('api/teams/<slug>/members', TeamMemberListView.as_view(), name='team_members'),
     path('api/taskcomplexities', TaskComplexityListView.as_view(), name='task_complexities'),
     
-    path('api/projects/<slug>/unfinished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
-    path('api/projects/<slug>/finished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
-    path('api/projects/<slug>/finished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
-    path('api/projects/<slug>/tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>', ProjectTaskListView.as_view(), name='project_tasks'),
+    path('api/projects/<slug>/unfinished_tasks/<start_date>/<end_date>', UnfinishedProjectTaskListView.as_view(), name='unfinished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/<int:complexity_weight>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
+    path('api/projects/<slug>/tasks/<start_date>/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
     
-    path('api/projects/<slug>/unfinished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
-    path('api/projects/<slug>/finished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
-    path('api/projects/<slug>/finished_tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
-    path('api/projects/<slug>/tasks/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/count', ProjectTaskCount.as_view(), name='project_task_count'),
-    
-    path('api/projects/<slug>/tasks/classificator/<int:test_development_time>/<int:test_validation_time>/<int:test_blocking_time>', ClassificatorTaskView.as_view(), name='classificator'),
+    path('api/projects/<slug>/unfinished_tasks/<start_date>/<end_date>/count', UnfinishedProjectTaskCount.as_view(), name='unfinished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/<int:complexity_weight>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/finished_tasks/<start_date>/<end_date>/count', FinishedProjectTaskCount.as_view(), name='finished_project_task_count'),
+    path('api/projects/<slug>/tasks/<start_date>/<end_date>/count', ProjectTaskCount.as_view(), name='project_task_count'),
 ]
