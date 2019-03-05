@@ -216,12 +216,20 @@ def get_all_project_tasks(slug=None, start_year=None, start_month=None, start_da
     return filter_tasks_by_date_interval(task_entities, start_year, start_month, start_day, end_year, end_month, end_day)
 
 class UnfinishedProjectTaskListView(views.APIView):
+    def get_unfinished_project_tasks(self, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
+        return get_unfinished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+
     def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
-        tasks_list = get_unfinished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+        tasks_list = self.get_unfinished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
         return response.Response([get_task_data(task) for task in tasks_list])
 
+class UnfinishedProjectTaskCount(views.APIView):
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
+        tasks_list = UnfinishedProjectTaskListView().get_unfinished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+        return response.Response(len(tasks_list))
+
 class FinishedProjectTaskListView(views.APIView):
-    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None, complexity_weight=None):
+    def get_finished_project_tasks(self, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None, complexity_weight=None):
         task_complexities = TaskComplexity.objects.filter(weight=complexity_weight)
         complexity = None
         if task_complexities:
@@ -232,12 +240,36 @@ class FinishedProjectTaskListView(views.APIView):
             project = projects[0]
         task_entities = None
         tasks_list = get_finished_project_tasks(project, complexity, start_year, start_month, start_day, end_year, end_month, end_day)
+        return tasks_list
+
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None, complexity_weight=None):
+        tasks_list = self.get_finished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day, complexity_weight)
         return response.Response(tasks_list)
 
+class FinishedProjectTaskCount(views.APIView):
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None, complexity_weight=None):
+        tasks_list = FinishedProjectTaskListView().get_finished_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day, complexity_weight)
+        task_count_structure = None
+        if complexity_weight is not None:
+            task_count_structure = len(tasks_list)
+        else:
+            task_count_structure = {}
+            for complexity_name in tasks_list:
+                task_count_structure[complexity_name] = len(tasks_list[complexity_name])
+        return response.Response(task_count_structure)
+
 class ProjectTaskListView(views.APIView):
+    def get_all_project_tasks(self, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
+        return get_all_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+
     def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
-        tasks_list = get_all_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+        tasks_list = self.get_all_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
         return response.Response([get_task_data(task) for task in tasks_list])
+
+class ProjectTaskCount(views.APIView):
+    def get(self, request, slug=None, start_year=None, start_month=None, start_day=None, end_year=None, end_month=None, end_day=None):
+        tasks_list = ProjectTaskListView().get_all_project_tasks(slug, start_year, start_month, start_day, end_year, end_month, end_day)
+        return response.Response(len(tasks_list))
 
 class ClassificatorTaskView(views.APIView):
     def get(self, request, slug=None, test_development_time=0, test_validation_time=0, test_blocking_time=0):
