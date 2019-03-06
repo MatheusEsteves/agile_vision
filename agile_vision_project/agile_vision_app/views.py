@@ -1,6 +1,7 @@
 from rest_framework import views, response
 from .models import *
 import datetime
+from datetime import date
 
 def get_member_data(member):
     return {
@@ -156,8 +157,7 @@ class TaskComplexityListView(views.APIView):
         task_complexities = TaskComplexity.objects.all()
         return response.Response([get_task_complexity_data(task_complexity) for task_complexity in task_complexities])
 
-def filter_tasks_by_date_interval(task_entities=None, start_date=None, end_date=None):
-    tasks_list = []
+def filter_task_entities(task_entities=None, start_date=None, end_date=None):
     if task_entities is not None:
         if start_date is not None and end_date is not None:
             task_entities = task_entities.filter(delivery_date__range=(start_date, end_date))
@@ -165,10 +165,23 @@ def filter_tasks_by_date_interval(task_entities=None, start_date=None, end_date=
             task_entities = task_entities.filter(delivery_date__gte=start_date)
         elif end_date is not None:
             task_entities = task_entities.filter(delivery_date__lte=end_date)
+    return task_entities
+
+def get_filtered_project_task_entities(slug=None, start_date=None, end_date=None):
+    project_task_entities = get_project_task_entities(slug)
+    if project_task_entities is not None:
+        project_task_entities = project_task_entities.all()
+        project_task_entities = filter_task_entities(project_task_entities, start_date, end_date)
+    return project_task_entities
+
+def filter_tasks_by_date_interval(task_entities=None, start_date=None, end_date=None):
+    tasks_list = []
+    if task_entities is not None:
+        task_entities = filter_task_entities(task_entities, start_date, end_date)
         tasks_list = list(task_entities.all())
 
         if tasks_list is not None and len(tasks_list) > 0:
-            tasks_list.sort(key=lambda task:task.delivery_date, reverse=True)
+            tasks_list.sort(key=lambda task:task.delivery_date, reverse=False)
     return tasks_list
 
 def get_finished_project_tasks(project=None, complexity=None, start_date=None, end_date=None):
@@ -189,22 +202,25 @@ def get_finished_project_tasks(project=None, complexity=None, start_date=None, e
     else:
         return []
 
-def get_unfinished_project_tasks(slug=None, start_date=None, end_date=None):
+def get_project_task_entities(slug=None):
     projects = Project.objects.filter(slug=slug)
     task_entities = None
     project = None
     if projects:
         project = projects[0]
-        task_entities = project.tasks.filter(complexity=None)
+        task_entities = project.tasks
+    return task_entities
+
+def get_unfinished_project_tasks(slug=None, start_date=None, end_date=None):
+    task_entities = get_project_task_entities(slug)
+    if task_entities is not None:
+        task_entities = task_entities.filter(complexity=None)
     return filter_tasks_by_date_interval(task_entities, start_date, end_date)
 
 def get_all_project_tasks(slug=None, start_date=None, end_date=None):
-    projects = Project.objects.filter(slug=slug)
-    task_entities = None
-    project = None
-    if projects:
-        project = projects[0]
-        task_entities = project.tasks.all()
+    task_entities = get_project_task_entities(slug)
+    if task_entities is not None:
+        task_entities = task_entities.all()
     return filter_tasks_by_date_interval(task_entities, start_date, end_date)
 
 
@@ -262,6 +278,44 @@ class FinishedProjectTaskCount(views.APIView):
             for complexity_name in tasks_list:
                 task_count_structure[complexity_name] = len(tasks_list[complexity_name])
         return response.Response(task_count_structure)
+
+class FinishedProjectTaskDateGroupListView(views.APIView):
+    def get_task_date_groups_structure(self, slug=None, start_date=None, end_date=None, interval_days=None):
+        task_entities = get_filtered_project_task_entities(slug, start_date, end_date)
+
+        start_year_str, start_month_str, start_day_str = start_date.split('-')
+        start_date_object = datetime.date(int(start_year_str), int(start_month_str), int(start_day_str))
+        end_year_str, end_month_str, end_day_str = end_date.split('-')
+        end_date_object = datetime.date(int(end_year_str), int(end_month_str), int(end_day_str))
+
+        task_date_groups_structure = {}
+        currently_start_date = start_date_object
+        currently_end_date = date.fromordinal(start_date_object.toordinal() + interval_days)
+        
+        while currently_end_date <= end_date_object:
+            interval_date_key = currently_start_date.__str__() + ',' + currently_end_date.__str__()
+            task_entities_range = task_entities.filter(delivery_date__range=(currently_start_date, currently_end_date))
+            task_date_groups_structure[interval_date_key] = [get_task_data(task) for task in task_entities_range]
+            currently_start_date = date.fromordinal(currently_end_date.toordinal() + 1)
+            currently_end_date = date.fromordinal(currently_start_date.toordinal() + interval_days)
+
+        if currently_start_date <= end_date_object:
+            interval_date_key = currently_start_date.__str__() + ',' + end_date_object.__str__()
+            task_entities_range = task_entities.filter(delivery_date__range=(currently_start_date, end_date_object))
+            task_date_groups_structure[interval_date_key] = [get_task_data(task) for task in task_entities_range]
+        return task_date_groups_structure
+    
+    def get(self, request, slug=None, start_date=None, end_date=None, interval_days=None):
+        task_date_groups_structure = self.get_task_date_groups_structure(slug, start_date, end_date, interval_days)
+        return response.Response(task_date_groups_structure)
+
+class FinishedProjectTaskDateGroupCount(views.APIView):
+    def get(self, request, slug=None, start_date=None, end_date=None, interval_days=None):
+        task_date_groups_structure = FinishedProjectTaskDateGroupListView().get_task_date_groups_structure(slug, start_date, end_date, interval_days)
+        task_date_groups_count_structure = {}
+        for interval_date_key in task_date_groups_structure:
+            task_date_groups_count_structure[interval_date_key] = len(task_date_groups_structure[interval_date_key])
+        return response.Response(task_date_groups_count_structure)
 
 class ProjectTaskListView(views.APIView):
     def get_all_project_tasks(self, slug=None, start_date=None, end_date=None):

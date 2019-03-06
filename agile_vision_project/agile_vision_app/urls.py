@@ -30,6 +30,14 @@ urlpatterns = [
     path('api/projects/<slug>/finished_tasks/start_date/<start_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
     path('api/projects/<slug>/finished_tasks/end_date/<end_date>', FinishedProjectTaskListView.as_view(), name='finished_project_tasks'),
 
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>/date_groups/<int:interval_days>', FinishedProjectTaskDateGroupListView.as_view(), name='finished_project_task_date_groups'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>/date_groups/<int:interval_days>', FinishedProjectTaskDateGroupListView.as_view(), name='finished_project_task_date_groups'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>/date_groups/<int:interval_days>', FinishedProjectTaskDateGroupListView.as_view(), name='finished_project_task_date_groups'),
+
+    path('api/projects/<slug>/finished_tasks/range_date/<start_date>/<end_date>/date_groups/<int:interval_days>/count', FinishedProjectTaskDateGroupCount.as_view(), name='finished_project_task_date_groups_count'),
+    path('api/projects/<slug>/finished_tasks/start_date/<start_date>/date_groups/<int:interval_days>/count', FinishedProjectTaskDateGroupCount.as_view(), name='finished_project_task_date_groups_count'),
+    path('api/projects/<slug>/finished_tasks/end_date/<end_date>/date_groups/<int:interval_days>/count', FinishedProjectTaskDateGroupCount.as_view(), name='finished_project_task_date_groups_count'),
+
     path('api/projects/<slug>/tasks/range_date/<start_date>/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
     path('api/projects/<slug>/tasks/start_date/<start_date>', ProjectTaskListView.as_view(), name='project_tasks'),
     path('api/projects/<slug>/tasks/end_date/<end_date>', ProjectTaskListView.as_view(), name='project_tasks'),
